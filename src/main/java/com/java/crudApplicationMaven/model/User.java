@@ -12,13 +12,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@Entity
-@Table(name = "Users")
+
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
+@Entity
+@Table(name = "Users")
 @Getter
-@ToString
+@Setter
 public class User implements UserDetails {
 
     @Id
@@ -44,7 +46,12 @@ public class User implements UserDetails {
     public String getUsername() {
         return email;
     }
-
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -52,16 +59,17 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
+
 }
