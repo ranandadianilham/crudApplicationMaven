@@ -2,8 +2,11 @@ package com.java.crudApplicationMaven.controller;
 
 import com.java.crudApplicationMaven.model.Post;
 import com.java.crudApplicationMaven.payload.request.ListPaginationRequest;
+import com.java.crudApplicationMaven.payload.response.BaseResponse;
+import com.java.crudApplicationMaven.payload.response.PostResponse;
 import com.java.crudApplicationMaven.repo.PostRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,15 +24,14 @@ public class BlogPostController {
     private PostRepo postRepo;
 
     @PostMapping("/list")
-    public ResponseEntity<Map<String, Object>> getAllPosts(@RequestBody ListPaginationRequest listPaginationRequest) {
-
+    public ResponseEntity<BaseResponse> getAllPosts(@RequestBody ListPaginationRequest listPaginationRequest) {
         try {
             Sort.Direction sortDirection = Sort.Direction.fromString(listPaginationRequest.getSortType());
             List<Post> postList = new ArrayList<>();
             postRepo.findAll(Sort.by(sortDirection, listPaginationRequest.getSortBy())).forEach(postList::add);
 
             if (postList.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                return new ResponseEntity<>(new BaseResponse(204,  "No Content", null),HttpStatus.NO_CONTENT);
             }
 
             int pageTotalCount = postList.size() < listPaginationRequest.getRowPerPage() ? 1
@@ -44,61 +46,77 @@ public class BlogPostController {
             responseBody.put("rowTotal", postList.size());
             responseBody.put("data", postList);
 
-            return new ResponseEntity<>(responseBody, HttpStatus.OK);
+            //return new ResponseEntity<>(responseBody, HttpStatus.OK);
+            return new ResponseEntity<>(new BaseResponse(200, "SUCCESS", responseBody), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new BaseResponse(404,  e.getMessage().toString(), null),HttpStatus.NOT_FOUND);
+
         }
     }
 
     //get post by id
     @GetMapping("/{id}")
-    public ResponseEntity<Post> getPostById(@PathVariable Long id) {
-        Optional<Post> postData = postRepo.findById(id);
+    public ResponseEntity<BaseResponse> getPostById(@PathVariable Long id) {
+        try {
+            Optional<Post> postData = postRepo.findById(id);
 
-        if (postData.isPresent()) {
-            return new ResponseEntity<>(postData.get(), HttpStatus.OK);
+            if (postData.isPresent()) {
+                return new ResponseEntity<>(new BaseResponse(200, "SUCCESS", postData.get()), HttpStatus.OK);
+            }
+            return new ResponseEntity<>(new BaseResponse(404, "NOT FOUND", null),HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new BaseResponse(404,  e.getMessage().toString(), null),HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Post> addPost(@RequestBody Post post, Errors errors) {
-        /*
-         * The endpoint should accept a JSON payload containing the title, body, and
-         * author of the blog post.
-         * The endpoint should return the created blog post with a generated ID.
-         */
-
-        if (errors.hasErrors()) {
-            return new ResponseEntity((errors), HttpStatus.BAD_REQUEST);
-        }
-
+    public ResponseEntity<BaseResponse> addPost(@RequestBody Post post, Errors errors) {
         Post postObj = postRepo.save(post);
-
-        return new ResponseEntity<>(postObj, HttpStatus.OK);
+        try {
+            if (errors.hasErrors()) {
+                return new ResponseEntity(new BaseResponse(404, "NOT FOUND", null), HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(new BaseResponse(200, "SUCCESS", postObj), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(new BaseResponse(404,  e.getMessage().toString(), null), HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping("/update/{id}")
-    public ResponseEntity<Post> updatePostById(@PathVariable Long id, @RequestBody Post newPostData) {
+    public ResponseEntity<BaseResponse> updatePostById(@PathVariable Long id, @RequestBody Post newPostData) {
 
         Optional<Post> oldPostData = postRepo.findById(id);
 
-        if (oldPostData.isPresent()) {
-            Post updatedPostData = oldPostData.get();
-            updatedPostData.setTitle(newPostData.getTitle());
-            updatedPostData.setAuthor(newPostData.getAuthor());
-            updatedPostData.setBody(newPostData.getBody());
+        try {
+            if (oldPostData.isPresent()) {
+                Post updatedPostData = oldPostData.get();
+                updatedPostData.setTitle(newPostData.getTitle());
+                updatedPostData.setAuthor(newPostData.getAuthor());
+                updatedPostData.setBody(newPostData.getBody());
 
-            Post postObj = postRepo.save(updatedPostData);
+                Post postObj = postRepo.save(updatedPostData);
 
-            return new ResponseEntity<>(postObj, HttpStatus.OK);
+                return new ResponseEntity<>(new BaseResponse(200, "SUCCESS", postObj), HttpStatus.OK);
+            }
+            return new ResponseEntity(new BaseResponse(404, "NOT FOUND", null), HttpStatus.NOT_FOUND);
+        }catch (Exception e) {
+            return new ResponseEntity(new BaseResponse(404, e.getMessage().toString(), null), HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<HttpStatus> deletePostById(@PathVariable Long id) {
-        postRepo.deleteById(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+    @PostMapping("/delete/{id}")
+    public ResponseEntity<PostResponse> deletePostById(@PathVariable Long id) {
+        try {
+            boolean entityExist = postRepo.existsById(id);
+            postRepo.deleteById(id);
+            if(entityExist) {
+                return new ResponseEntity<>(new PostResponse(200, "success"), HttpStatus.OK);
+            }else {
+                return new ResponseEntity<>(new PostResponse(404, "NOT FOUND"), HttpStatus.NOT_FOUND);
+            }
+        }catch (Exception e) {
+            return new ResponseEntity<>(new PostResponse(404,  e.getMessage().toString()), HttpStatus.NOT_FOUND);
+        }
+
     }
 }

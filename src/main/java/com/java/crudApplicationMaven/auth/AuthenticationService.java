@@ -22,18 +22,18 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
+        System.out.println("req bod: "+request);
+        String encodedPass = request.getPassword() == "" ? request.getPassword() : passwordEncoder.encode(request.getPassword());
         var user = User.builder()
                 .email(request.getEmail())
                 .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
+                .password(encodedPass)
                 .role(Role.USER)
                 .build();
-
         repo.save(user);
-
+        System.out.println("req after: "+user);
         var jwtToken = jwtService.generateToken(user);
          return AuthenticationResponse.builder().token(jwtToken).build();
-
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -43,10 +43,8 @@ public class AuthenticationService {
                         request.getPassword()
                 )
         );
-
         var user = repo.findByEmail(request.getEmail())
                 .orElseThrow();
-
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder().token(jwtToken).build();
     }
