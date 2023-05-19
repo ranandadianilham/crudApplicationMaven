@@ -1,10 +1,11 @@
 package com.java.crudApplicationMaven.controller;
 
+import com.java.crudApplicationMaven.constant.enumeration.ResponseStatusCode;
 import com.java.crudApplicationMaven.model.Post;
 import com.java.crudApplicationMaven.payload.request.PostGetAllRequest;
 import com.java.crudApplicationMaven.payload.response.BaseResponse;
 import com.java.crudApplicationMaven.repo.PostRepo;
-import com.java.crudApplicationMaven.service.listPagination.PostService;
+import com.java.crudApplicationMaven.service.PostService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/blog/post")
-@SuppressWarnings("unchecked")
+@SuppressWarnings("all")
 public class BlogPostController {
 
     @Autowired
@@ -32,13 +33,18 @@ public class BlogPostController {
     @PostMapping("/list")
     public ResponseEntity<BaseResponse> getAllPosts(@RequestBody PostGetAllRequest postGetAllRequest) {
         try {
-            List<Post> postList = new ArrayList<>();
+            //get sort Direction
             Sort.Direction sortDirection = Sort.Direction.fromString(postGetAllRequest.getSortType());
+
+            //Get Posts data with pagination and sorted
             Page<Post> paginatedData = postService.getPaginatedAndSortedData(
                     postGetAllRequest.getPageNo(), postGetAllRequest.getRowPerPage(),  postGetAllRequest.getSortBy(), sortDirection );
+            //if data empty
             if (postGetAllRequest.getPageNo() >= paginatedData.getTotalPages()) {
-                return new ResponseEntity<>(new BaseResponse(404,  "Not Found", null),HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(),  ResponseStatusCode.DATA_NOT_FOUND.desc(), null),HttpStatus.NOT_FOUND);
             }
+
+            //mapped response body
             Map<String, Object> responseBody = new HashMap<>();
             responseBody.put("pageNo", postGetAllRequest.getPageNo());
             responseBody.put("rowPerPage", postGetAllRequest.getRowPerPage());
@@ -47,25 +53,27 @@ public class BlogPostController {
             responseBody.put("sortType", sortDirection);
             responseBody.put("rowTotal", paginatedData.getTotalElements());
             responseBody.put("data", paginatedData.getContent());
-            return new ResponseEntity<>(new BaseResponse(200, "SUCCESS", responseBody), HttpStatus.OK);
+
+            //return response body
+            return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.SUCCESS.code(), ResponseStatusCode.SUCCESS.desc(), responseBody), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(new BaseResponse(404,  e.getMessage(), null),HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(), e.getMessage(), null),HttpStatus.NOT_FOUND);
 
         }
     }
 
-    //get post by id
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getPostById(@PathVariable Long id) {
         try {
+            //get data by id
             Optional<Post> postData = postRepo.findById(id);
-
+            //if exist
             if (postData.isPresent()) {
-                return new ResponseEntity<>(new BaseResponse(200, "SUCCESS", postData.get()), HttpStatus.OK);
+                return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.SUCCESS.code(), ResponseStatusCode.SUCCESS.desc(),  postData.get()), HttpStatus.OK);
             }
-            return new ResponseEntity<>(new BaseResponse(404, "NOT FOUND", null),HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(), ResponseStatusCode.DATA_NOT_FOUND.desc(), null),HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return new ResponseEntity<>(new BaseResponse(404,  e.getMessage(), null),HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(), e.getMessage(), null),HttpStatus.NOT_FOUND);
         }
     }
 
@@ -75,27 +83,25 @@ public class BlogPostController {
         try {
         Post postObj = postRepo.save(post);
             if (errors.hasErrors()) {
-                return new ResponseEntity(new BaseResponse(404, "NOT FOUND", null), HttpStatus.NOT_FOUND);
+                return new ResponseEntity(new BaseResponse(404, ResponseStatusCode.DATA_NOT_FOUND.desc(), null), HttpStatus.NOT_FOUND);
             }
-            return new ResponseEntity<>(new BaseResponse(200, "SUCCESS", postObj), HttpStatus.OK);
+            return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.SUCCESS.code(), ResponseStatusCode.SUCCESS.desc(),  postObj), HttpStatus.OK);
         }catch (ConstraintViolationException e) {
             String messageTemplate = "";
             Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
             for (ConstraintViolation<?> violation : violations) {
                 messageTemplate = violation.getMessageTemplate();
             }
-            return new ResponseEntity<>(new BaseResponse(404, messageTemplate, null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(), messageTemplate, null), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity(new BaseResponse(404,  e.getMessage(), null), HttpStatus.NOT_FOUND);
+            return new ResponseEntity(new BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(),  e.getMessage(), null), HttpStatus.NOT_FOUND);
         }
     }
 
     @PostMapping("/update/{id}")
     public ResponseEntity<BaseResponse> updatePostById(@PathVariable Long id, @RequestBody Post newPostData) {
-
-        Optional<Post> oldPostData = postRepo.findById(id);
-
         try {
+            Optional<Post> oldPostData = postRepo.findById(id);
             if (oldPostData.isPresent()) {
                 Post updatedPostData = oldPostData.get();
                 updatedPostData.setTitle(newPostData.getTitle());
@@ -104,11 +110,11 @@ public class BlogPostController {
 
                 Post postObj = postRepo.save(updatedPostData);
 
-                return new ResponseEntity<>(new BaseResponse(200, "SUCCESS", postObj), HttpStatus.OK);
+                return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.SUCCESS.code(), ResponseStatusCode.SUCCESS.desc(),  postObj), HttpStatus.OK);
             }
-            return new ResponseEntity(new BaseResponse(404, "NOT FOUND", null), HttpStatus.NOT_FOUND);
+            return new ResponseEntity(new BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(), ResponseStatusCode.DATA_NOT_FOUND.desc(), null), HttpStatus.NOT_FOUND);
         }catch (Exception e) {
-            return new ResponseEntity(new BaseResponse(404, e.getMessage(), null), HttpStatus.NOT_FOUND);
+            return new ResponseEntity(new BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(), e.getMessage(), null), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -118,13 +124,13 @@ public class BlogPostController {
             boolean entityExist = postRepo.existsById(id);
             postRepo.deleteById(id);
             if(entityExist) {
-                return new ResponseEntity<>(new BaseResponse(200, "SUCCESS", null), HttpStatus.OK);
+                return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.SUCCESS.code(), ResponseStatusCode.SUCCESS.desc(),  null), HttpStatus.OK);
 
             }else {
-                return new ResponseEntity(new BaseResponse(404, "NOT FOUND", null), HttpStatus.NOT_FOUND);
+                return new ResponseEntity(new BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(), ResponseStatusCode.DATA_NOT_FOUND.desc(), null), HttpStatus.NOT_FOUND);
             }
         }catch (Exception e) {
-            return new ResponseEntity(new BaseResponse(404, e.getMessage(), null), HttpStatus.NOT_FOUND);
+            return new ResponseEntity(new BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(), e.getMessage(), null), HttpStatus.NOT_FOUND);
 
         }
 

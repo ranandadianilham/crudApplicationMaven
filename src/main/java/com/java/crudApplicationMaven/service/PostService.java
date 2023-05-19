@@ -1,4 +1,4 @@
-package com.java.crudApplicationMaven.service.listPagination;
+package com.java.crudApplicationMaven.service;
 
 import com.java.crudApplicationMaven.model.Post;
 import com.java.crudApplicationMaven.repo.PostRepo;
