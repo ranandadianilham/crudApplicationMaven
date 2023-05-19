@@ -1,7 +1,7 @@
 package com.java.crudApplicationMaven.service.listPagination;
 
 import com.java.crudApplicationMaven.constant.enumeration.SortType;
-import com.java.crudApplicationMaven.payload.request.ListPaginationRequest;
+import com.java.crudApplicationMaven.payload.request.PostGetAllRequest;
 import com.java.crudApplicationMaven.payload.response.ListPaginationResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -17,7 +17,7 @@ public abstract class BaseListPagination<T> {
 
     @SuppressWarnings("unchecked")
     protected ListPaginationResponse<T> getListPaginationResponse(
-            Class<T> tClass, ListPaginationRequest listPagingRequest) {
+            Class<T> tClass, PostGetAllRequest listPagingRequest) {
 
         String originalSortBy = listPagingRequest.getSortBy();
         String originalSortType = listPagingRequest.getSortType();
@@ -118,7 +118,7 @@ public abstract class BaseListPagination<T> {
 
     public abstract Integer getCountAllData(String keyword);
 
-    public abstract List<T> getListPaginationData(ListPaginationRequest listPaginationRequest);
+    public abstract List<T> getListPaginationData(PostGetAllRequest postGetAllRequest);
 
     public abstract List<T> getAllListData(String sortBy, SortType sortType);
 }

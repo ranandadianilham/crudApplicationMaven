@@ -19,8 +19,6 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "Users")
-@Getter
-@Setter
 public class User implements UserDetails {
 
     @Id
@@ -45,12 +43,8 @@ public class User implements UserDetails {
         return password;
     }
     @Override
-    public String getUsername() {
-        return username;
-    }
-    public String getEmail() {
-        return email;
-    }
+    public String getUsername() { return username; }
+    public String getEmail() {return email;}
     public void setEmail(String email) {
         this.email = email;
     }

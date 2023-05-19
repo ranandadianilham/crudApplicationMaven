@@ -1,39 +1,35 @@
 package com.java.crudApplicationMaven.payload.request;
 
-import java.util.List;
-
-import com.java.crudApplicationMaven.constant.ListPaginationConstant;
+import com.java.crudApplicationMaven.constant.PaginationConstant;
 import com.java.crudApplicationMaven.constant.enumeration.SortType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 @SuppressWarnings("all")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ListPaginationRequest {
+public class PostGetAllRequest {
 
     // current page's number
-    private int pageNo = ListPaginationConstant.DEFAULT_PAGINATION_PAGE_NUMBER;
+    // start from 0
+    private int pageNo = PaginationConstant.DEFAULT_PAGINATION_PAGE_NUMBER;
     // row per page
-    private int rowPerPage = ListPaginationConstant.DEFAULT_PAGINATION_ROW_PER_PAGE;
-    private int offset = ListPaginationConstant.DEFAULT_PAGINATION_OFFSET;
-    private String sortBy = ListPaginationConstant.DEFAULT_PAGINATION_SORTBY;
+    private int rowPerPage = PaginationConstant.DEFAULT_PAGINATION_ROW_PER_PAGE;
+    private int offset = PaginationConstant.DEFAULT_PAGINATION_OFFSET;
+    private String sortBy = PaginationConstant.DEFAULT_PAGINATION_SORTBY;
     private String sortType = SortType.DEFAULT_SORT_TYPE.value();
 
     public int getPageNo() {
-        return pageNo = pageNo < ListPaginationConstant.DEFAULT_PAGINATION_PAGE_NUMBER
-                ? ListPaginationConstant.DEFAULT_PAGINATION_PAGE_NUMBER
+        return pageNo = pageNo < PaginationConstant.DEFAULT_PAGINATION_PAGE_NUMBER
+                ? PaginationConstant.DEFAULT_PAGINATION_PAGE_NUMBER
                 : pageNo;
     }
 
     public int getRowPerPage() {
-        return rowPerPage = rowPerPage < 1 ? ListPaginationConstant.DEFAULT_PAGINATION_ROW_PER_PAGE : rowPerPage;
+        return rowPerPage = rowPerPage < 1 ? PaginationConstant.DEFAULT_PAGINATION_ROW_PER_PAGE : rowPerPage;
     }
 
     public String getSortBy() {

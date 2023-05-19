@@ -20,12 +20,13 @@ public class AuthenticationController {
 
     private final AuthenticationService service;
 
+    /*need get user*/
+
     @PostMapping("/register")
     public ResponseEntity<BaseResponse> register(@RequestBody RegisterRequest request) {
         try {
             return new ResponseEntity<>(new BaseResponse(200, "success", service.register(request)), HttpStatus.OK);
-        }
-        catch (ConstraintViolationException e) {
+        } catch (ConstraintViolationException e) {
             String messageTemplate = "";
             Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
             for (ConstraintViolation<?> violation : violations) {
@@ -33,8 +34,7 @@ public class AuthenticationController {
                 System.out.println(messageTemplate);
             }
             return new ResponseEntity<>(new BaseResponse(404, messageTemplate, null), HttpStatus.BAD_REQUEST);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
             return new ResponseEntity<>(new BaseResponse(404, e.getLocalizedMessage(), null), HttpStatus.BAD_REQUEST);
         }
@@ -44,7 +44,15 @@ public class AuthenticationController {
     public ResponseEntity<BaseResponse> authenticate(@RequestBody AuthenticationRequest request) {
         try {
             return new ResponseEntity<>(new BaseResponse(200, "success", service.authenticate(request)), HttpStatus.OK);
-        }catch (Exception e){
+        } catch (ConstraintViolationException e) {
+            String messageTemplate = "";
+            Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
+            for (ConstraintViolation<?> violation : violations) {
+                messageTemplate = violation.getMessageTemplate();
+                System.out.println(messageTemplate);
+            }
+            return new ResponseEntity<>(new BaseResponse(404, messageTemplate, null), HttpStatus.BAD_REQUEST);
+        }  catch (Exception e) {
             System.out.println(e);
             return new ResponseEntity<>(new BaseResponse(404, e.getLocalizedMessage(), null), HttpStatus.BAD_REQUEST);
         }

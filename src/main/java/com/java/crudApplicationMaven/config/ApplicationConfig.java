@@ -22,6 +22,13 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
+        /* new UserDetailsService() {
+            @Override
+            public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+                return null;
+            }
+        }; */
+
         return username -> repo.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
     }

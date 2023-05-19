@@ -1,6 +1,6 @@
 package com.java.crudApplicationMaven.payload.response;
 
-import com.java.crudApplicationMaven.constant.ListPaginationConstant;
+import com.java.crudApplicationMaven.constant.PaginationConstant;
 import com.java.crudApplicationMaven.constant.enumeration.SortType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
@@ -26,11 +26,11 @@ public class ListPaginationResponse<T> {
         private SortType sortType;
     }
 
-    private int pageNo = ListPaginationConstant.DEFAULT_PAGINATION_PAGE_NUMBER;
-    private int rowPerPage = ListPaginationConstant.DEFAULT_PAGINATION_ROW_PER_PAGE;
+    private int pageNo = PaginationConstant.DEFAULT_PAGINATION_PAGE_NUMBER;
+    private int rowPerPage = PaginationConstant.DEFAULT_PAGINATION_ROW_PER_PAGE;
     private int pageTotal;
     private int rowTotal;
-    private String sortBy = ListPaginationConstant.DEFAULT_PAGINATION_SORTBY;
+    private String sortBy = PaginationConstant.DEFAULT_PAGINATION_SORTBY;
     private SortType sortType = SortType.DEFAULT_SORT_TYPE;
     private List<T> list;
 

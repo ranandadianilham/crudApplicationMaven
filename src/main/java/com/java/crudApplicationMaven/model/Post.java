@@ -1,25 +1,23 @@
 package com.java.crudApplicationMaven.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Entity
 @Table(name = "Posts")
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
-@Getter
-@ToString
+@Data
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @NotNull(message = "Title cannot empty")
+    @NotBlank(message = "Title cannot empty")
     private String title;
-    @NotNull(message = "Body cannot empty")
+    @NotBlank(message = "Body cannot empty")
     private String body;
-    @NotNull(message = "Author cannot empty")
+    @NotBlank(message = "Author cannot empty")
     private String author;
 
 }
