@@ -19,7 +19,6 @@ public class AuthenticationService {
         private final UserRepo repo;
         private final PasswordEncoder passwordEncoder;
         private final JwtService jwtService;
-
         private final AuthenticationManager authenticationManager;
 
         public AuthenticationResponse register(RegisterRequest request) {

@@ -1,6 +1,7 @@
 package com.java.crudApplicationMaven.service;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,21 +12,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @SuppressWarnings("all")
+@ExtendWith(MockitoExtension.class) //extension to initialize mock in Junit5,
 class TestServiceTest {
+
+    @Mock
+    private List<String> mockingList;
+
     @Test
     public void testCalculateArea() {
         int expected = 16;
-
         assertEquals(expected, TestService.calculateArea(4, 4));
     }
 
-    @Mock
-    private List<String> mockList;
-
     @Test
-    void TestList() {
+    void TestListMocked() {
         // actual array list
         List<String> mockedList = new ArrayList<>();
         // actually add value into
@@ -51,5 +54,12 @@ class TestServiceTest {
         // verify(mockedList).add("one");
         // check if value is equal?
         assertEquals(0, mockList.size());
+    }
+
+    @Test
+    void TestListMocking() {
+        // need @ExtendWith(MockitoExtension.class), else nullpointerexception
+        mockingList.add("one");
+        verify(mockingList).add("one");
     }
 }
