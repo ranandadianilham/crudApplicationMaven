@@ -1,6 +1,7 @@
 package com.java.crudApplicationMaven.config;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -18,7 +19,13 @@ public class JwtService {
     private static final String SECRET_KEY = "6150645367566B5970337336763979244226452948404D6251655468576D5A71";
 
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+
+        try {
+            return extractClaim(token, Claims::getSubject);
+        }catch (ExpiredJwtException e){
+            System.out.println("token is Expired: " + e.getMessage());
+            return null;
+        }
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
