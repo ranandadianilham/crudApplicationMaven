@@ -20,4 +20,4 @@ Demo project for Spring Boot.
 - Hibernate Validator 8.0.0.Final
 - Spring Security 3.0.5
 - JSON Web Token (JWT) 0.11.5
-- JUnit 4.13.2
+- JUnit 5.9.2

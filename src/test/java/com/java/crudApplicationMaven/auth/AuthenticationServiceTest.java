@@ -67,7 +67,7 @@ class AuthenticationServiceTest {
         result.encode(password);
         verify(result).encode(password);
 
-        // passwordEncoder.encode(password);
+        passwordEncoder.encode(password);
         // Assert
         // assertEquals(encodedPassword, result);
         verify(passwordEncoder).encode(password);
