@@ -48,3 +48,7 @@ insert into Posts (id, title, author, body) values (47, 'Rush', 'Veronique O''Ne
 insert into Posts (id, title, author, body) values (48, 'Dying Young', 'Toma Delucia', 'suspendisse potenti in eleifend quam a odio in hac habitasse platea dictumst');
 insert into Posts (id, title, author, body) values (49, 'Counselor, The', 'Salaidh Ruse', 'gravida sem praesent id massa id nisl venenatis lacinia aenean sit amet justo morbi ut odio cras mi');
 insert into Posts (id, title, author, body) values (50, 'Feeling Minnesota', 'Dennison Wardesworth', 'molestie hendrerit at vulputate vitae nisl aenean lectus pellentesque eget nunc donec quis orci eget orci vehicula condimentum curabitur in');
+
+
+/* set id GeneratedValue to continue initial data inserted (50 datas) */
+ALTER TABLE Posts ALTER COLUMN id RESTART WITH 51;
