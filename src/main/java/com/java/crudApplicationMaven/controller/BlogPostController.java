@@ -36,6 +36,7 @@ public class BlogPostController {
             Sort.Direction sortDirection = Sort.Direction.fromString(postGetAllRequest.getSortType());
 
             // Get Posts data with pagination and sorted
+            // pagination start from page 0.
             Page<Post> paginatedData = postService.getPaginatedAndSortedData(
                     postGetAllRequest.getPageNo(), postGetAllRequest.getRowPerPage(), postGetAllRequest.getSortBy(),
                     sortDirection);
