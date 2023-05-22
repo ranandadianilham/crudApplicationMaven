@@ -29,8 +29,8 @@ public class BlogPostController {
     @Autowired
     private PostService postService;
 
-    @PostMapping("/list")
-    public ResponseEntity<BaseResponse> getAllPosts(@RequestBody PostGetAllRequest postGetAllRequest) {
+    @PostMapping("/list/paginated")
+    public ResponseEntity<BaseResponse> getAllPostsPaginated(@RequestBody PostGetAllRequest postGetAllRequest) {
         try {
             // get sort Direction
             Sort.Direction sortDirection = Sort.Direction.fromString(postGetAllRequest.getSortType());
@@ -54,6 +54,39 @@ public class BlogPostController {
             responseBody.put("sortType", sortDirection);
             responseBody.put("rowTotal", paginatedData.getTotalElements());
             responseBody.put("data", paginatedData.getContent());
+
+            // return response body
+            return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.SUCCESS.code(),
+                    ResponseStatusCode.SUCCESS.desc(), responseBody), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(
+                    new BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(), e.getMessage(), null),
+                    HttpStatus.NOT_FOUND);
+
+        }
+    }
+
+    @PostMapping("/list/all")
+    public ResponseEntity<BaseResponse> getAllPosts(@RequestBody PostGetAllRequest postGetAllRequest) {
+        try {
+            // get sort Direction
+            Sort.Direction sortDirection = Sort.Direction.fromString(postGetAllRequest.getSortType());
+
+            // Get Posts data with pagination and sorted
+            List<Post> paginatedData = postService.getSortedDataAll(postGetAllRequest.getSortBy(),
+                    sortDirection);
+            // if data empty
+            if (paginatedData.size() == 0) {
+                return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(),
+                        "Empty List", null), HttpStatus.NOT_FOUND);
+            }
+
+            // mapped response body
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("sortBy", postGetAllRequest.getSortBy());
+            responseBody.put("sortType", sortDirection);
+            responseBody.put("rowTotal", paginatedData.size());
+            responseBody.put("data", paginatedData);
 
             // return response body
             return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.SUCCESS.code(),
