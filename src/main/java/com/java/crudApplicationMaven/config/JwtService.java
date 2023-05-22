@@ -19,18 +19,17 @@ public class JwtService {
     private static final String SECRET_KEY = "6150645367566B5970337336763979244226452948404D6251655468576D5A71";
 
     public String extractUsername(String token) {
-
         try {
             return extractClaim(token, Claims::getSubject);
-        }catch (ExpiredJwtException e){
-            System.out.println("token is Expired: " + e.getMessage());
+        } catch (ExpiredJwtException e) {
+            e.printStackTrace();
             return null;
         }
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-       final Claims claims = extractAllClaims(token);
-       return claimsResolver.apply(claims);
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
     }
 
     public String generateToken(UserDetails userDetails) {
@@ -39,8 +38,7 @@ public class JwtService {
 
     public String generateToken(
             Map<String, Object> extractClaims,
-            UserDetails userDetails
-    ){
+            UserDetails userDetails) {
         return Jwts
                 .builder()
                 .setClaims(extractClaims)
