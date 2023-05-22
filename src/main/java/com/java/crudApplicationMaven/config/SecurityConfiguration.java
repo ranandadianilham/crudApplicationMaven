@@ -2,7 +2,6 @@ package com.java.crudApplicationMaven.config;
 
 import lombok.RequiredArgsConstructor;
 
-import org.apache.tomcat.util.http.parser.MediaType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -12,8 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.ErrorResponse;
-
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.java.crudApplicationMaven.payload.response.BaseResponse;
 
@@ -57,7 +55,9 @@ public class SecurityConfiguration {
                 .csrf()
                 .disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/v1/auth/**", "/h2/**", "/h2")
+                .requestMatchers("/api/v1/auth/**")
+                .permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/h2/**"))
                 .permitAll()
                 .anyRequest()
                 .authenticated()
@@ -68,6 +68,7 @@ public class SecurityConfiguration {
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
+        http.headers().frameOptions().disable();
         return http.build();
     }
 }

@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.java.crudApplicationMaven.constant.enumeration.ResponseStatusCode;
 import com.java.crudApplicationMaven.model.Post;
 import com.java.crudApplicationMaven.payload.request.PostGetAllRequest;
-import com.java.crudApplicationMaven.repo.PostRepo;
-import com.java.crudApplicationMaven.service.PostService;
 import java.security.Key;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
