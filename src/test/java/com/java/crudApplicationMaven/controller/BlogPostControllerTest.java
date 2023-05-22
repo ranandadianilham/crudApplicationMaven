@@ -41,12 +41,6 @@ class BlogPostControllerTest {
     private WebApplicationContext webApplicationContext;
 
     @Autowired
-    private PostRepo postRepo;
-
-    @Autowired
-    private PostService postService;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
     private MockMvc mockMvc;

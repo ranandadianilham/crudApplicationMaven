@@ -1,5 +1,10 @@
 package com.java.crudApplicationMaven.auth;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.java.crudApplicationMaven.constant.enumeration.ResponseStatusCode;
+import net.bytebuddy.utility.nullability.AlwaysNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -7,49 +12,74 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 //@WebMvcTest(AuthenticationController.class)
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class AuthenticationControllerTest {
 
-    @Mock
-    private AuthenticationService authenticationService;
+    @Autowired
+    private WebApplicationContext webApplicationContext;
 
-    @Mock
-    private AuthenticationResponse authenticationResponse = new AuthenticationResponse("token123");
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private MockMvc mockMvc;
+
+    @BeforeEach
+    public void setup() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    }
 
     @Test
-    void registerTest() {
+    void registerTest() throws JsonProcessingException, Exception {
         RegisterRequest request = new RegisterRequest();
         request.setEmail("test@example.com");
         request.setPassword("password123");
         request.setUsername("username");
 
-        authenticationService.register(request);
+        // Perform the request
+        ResultActions resultActions = mockMvc.perform(post("/api/v1/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
 
-        verify(authenticationService).register(request);
-        lenient().when(authenticationService.register(request)).thenReturn(authenticationResponse);
+        // Verify the response
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(ResponseStatusCode.SUCCESS.code()))
+                .andExpect(jsonPath("$.desc").value(ResponseStatusCode.SUCCESS.desc()))
+                .andExpect(jsonPath("$.data").exists());
     }
 
     @Test
-    void authenticationTest() {
+    void authenticationTest() throws JsonProcessingException, Exception {
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(
                 "test@example.com",
                 "password123");
 
-        authenticationService.authenticate(authenticationRequest);
+        // Perform the request
+        ResultActions resultActions = mockMvc.perform(post("/api/v1/auth/authenticate")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(authenticationRequest)));
 
-        verify(authenticationService).authenticate(authenticationRequest);
-
-        lenient().when(authenticationService.authenticate(authenticationRequest)).thenReturn(authenticationResponse);
+        // Verify the response
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(ResponseStatusCode.SUCCESS.code()))
+                .andExpect(jsonPath("$.desc").value(ResponseStatusCode.SUCCESS.desc()))
+                .andExpect(jsonPath("$.data").exists());
     }
 }
