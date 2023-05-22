@@ -12,7 +12,7 @@ import lombok.*;
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
     @NotBlank(message = "Title cannot empty")
     private String title;
     @NotBlank(message = "Body cannot empty")
