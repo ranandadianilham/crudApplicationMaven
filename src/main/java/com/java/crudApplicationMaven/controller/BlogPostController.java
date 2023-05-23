@@ -36,8 +36,7 @@ public class BlogPostController {
             Sort.Direction sortDirection = Sort.Direction.fromString(postGetAllRequest.getSortType());
             // just allow get all without page in body
             Map<String, Object> responseBody = new HashMap<>();
-
-            // if pageNo empty & rowPerPage empty get all
+            // if page no empty, row per page empty get all
             if (postGetAllRequest.getPageNo() == 0 && postGetAllRequest.getRowPerPage() == 0) {
                 List<Post> paginatedData = postService.getSortedDataAll(postGetAllRequest.getSortBy(),
                         sortDirection);

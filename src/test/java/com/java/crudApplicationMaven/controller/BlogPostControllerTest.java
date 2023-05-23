@@ -50,15 +50,38 @@ class BlogPostControllerTest {
 
         private static final String SECRET_KEY = "6150645367566B5970337336763979244226452948404D6251655468576D5A71";
 
+        /*
+         * @Test
+         * public void testGetAllPosts() throws Exception {
+         * // Prepare the request body
+         * PostGetAllRequest request = new PostGetAllRequest();
+         * request.setSortType("ASC");
+         * request.setSortBy("title");
+         * 
+         * // Perform the request
+         * ResultActions resultActions = mockMvc.perform(post("/blog/post/list/all")
+         * .contentType(MediaType.APPLICATION_JSON)
+         * .content(objectMapper.writeValueAsString(request)));
+         * 
+         * // Verify the response
+         * resultActions.andExpect(status().isOk())
+         * .andExpect(jsonPath("$.code").value(ResponseStatusCode.SUCCESS.code()))
+         * .andExpect(jsonPath("$.desc").value(ResponseStatusCode.SUCCESS.desc()))
+         * .andExpect(jsonPath("$.data").exists());
+         * }
+         */
+
         @Test
-        public void testGetAllPosts() throws Exception {
+        public void testGetPostsPaginated() throws Exception {
                 // Prepare the request body
                 PostGetAllRequest request = new PostGetAllRequest();
                 request.setSortType("ASC");
+                request.setPageNo(0);
+                request.setRowPerPage(10);
                 request.setSortBy("title");
 
                 // Perform the request
-                ResultActions resultActions = mockMvc.perform(post("/blog/post/list/all")
+                ResultActions resultActions = mockMvc.perform(post("/blog/post/list/paginated")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)));
 
@@ -72,10 +95,9 @@ class BlogPostControllerTest {
         @Test
         public void testGetAllPostsPaginated() throws Exception {
                 // Prepare the request body
+                // without pageNo & pageRow
                 PostGetAllRequest request = new PostGetAllRequest();
                 request.setSortType("ASC");
-                request.setPageNo(0);
-                request.setRowPerPage(10);
                 request.setSortBy("title");
 
                 // Perform the request
