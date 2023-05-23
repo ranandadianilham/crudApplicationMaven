@@ -15,21 +15,19 @@ public class PostGetAllRequest {
 
     // current page's number
     // start from 0
-    private int pageNo = PaginationConstant.DEFAULT_PAGINATION_PAGE_NUMBER;
+    private int pageNo;
     // row per page
-    private int rowPerPage = PaginationConstant.DEFAULT_PAGINATION_ROW_PER_PAGE;
+    private int rowPerPage;
     private int offset = PaginationConstant.DEFAULT_PAGINATION_OFFSET;
     private String sortBy = PaginationConstant.DEFAULT_PAGINATION_SORTBY;
     private String sortType = SortType.DEFAULT_SORT_TYPE.value();
 
     public int getPageNo() {
-        return pageNo = pageNo < PaginationConstant.DEFAULT_PAGINATION_PAGE_NUMBER
-                ? PaginationConstant.DEFAULT_PAGINATION_PAGE_NUMBER
-                : pageNo;
+        return pageNo;
     }
 
     public int getRowPerPage() {
-        return rowPerPage = rowPerPage < 1 ? PaginationConstant.DEFAULT_PAGINATION_ROW_PER_PAGE : rowPerPage;
+        return rowPerPage;
     }
 
     public String getSortBy() {

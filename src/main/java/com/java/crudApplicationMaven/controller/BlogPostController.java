@@ -34,20 +34,41 @@ public class BlogPostController {
         try {
             // get sort Direction
             Sort.Direction sortDirection = Sort.Direction.fromString(postGetAllRequest.getSortType());
+            // just allow get all without page in body
+            Map<String, Object> responseBody = new HashMap<>();
+
+            // if pageNo empty & rowPerPage empty get all
+            if (postGetAllRequest.getPageNo() == 0 && postGetAllRequest.getRowPerPage() == 0) {
+                List<Post> paginatedData = postService.getSortedDataAll(postGetAllRequest.getSortBy(),
+                        sortDirection);
+                // if data empty
+                if (paginatedData.size() == 0) {
+                    return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(),
+                            "Empty List", null), HttpStatus.NOT_FOUND);
+                }
+
+                // mapped response body
+                responseBody.put("sortBy", postGetAllRequest.getSortBy());
+                responseBody.put("sortType", sortDirection);
+                responseBody.put("rowTotal", paginatedData.size());
+                responseBody.put("data", paginatedData);
+
+                return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.SUCCESS.code(),
+                        ResponseStatusCode.SUCCESS.desc(), responseBody), HttpStatus.OK);
+            }
 
             // Get Posts data with pagination and sorted
             // pagination start from page 0.
             Page<Post> paginatedData = postService.getPaginatedAndSortedData(
                     postGetAllRequest.getPageNo(), postGetAllRequest.getRowPerPage(), postGetAllRequest.getSortBy(),
                     sortDirection);
+
             // if data empty
-            if (postGetAllRequest.getPageNo() >= paginatedData.getTotalPages()) {
+            if (paginatedData.getSize() == 0) {
                 return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(),
                         ResponseStatusCode.DATA_NOT_FOUND.desc(), null), HttpStatus.NOT_FOUND);
             }
-
             // mapped response body
-            Map<String, Object> responseBody = new HashMap<>();
             responseBody.put("pageNo", postGetAllRequest.getPageNo());
             responseBody.put("rowPerPage", postGetAllRequest.getRowPerPage());
             responseBody.put("pageTotal", paginatedData.getTotalPages());
@@ -67,39 +88,45 @@ public class BlogPostController {
         }
     }
 
-    @PostMapping("/list/all")
-    public ResponseEntity<BaseResponse> getAllPosts(@RequestBody PostGetAllRequest postGetAllRequest) {
-        try {
-            // get sort Direction
-            Sort.Direction sortDirection = Sort.Direction.fromString(postGetAllRequest.getSortType());
-
-            // Get Posts data with pagination and sorted
-            List<Post> paginatedData = postService.getSortedDataAll(postGetAllRequest.getSortBy(),
-                    sortDirection);
-            // if data empty
-            if (paginatedData.size() == 0) {
-                return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(),
-                        "Empty List", null), HttpStatus.NOT_FOUND);
-            }
-
-            // mapped response body
-            Map<String, Object> responseBody = new HashMap<>();
-            responseBody.put("sortBy", postGetAllRequest.getSortBy());
-            responseBody.put("sortType", sortDirection);
-            responseBody.put("rowTotal", paginatedData.size());
-            responseBody.put("data", paginatedData);
-
-            // return response body
-            return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.SUCCESS.code(),
-                    ResponseStatusCode.SUCCESS.desc(), responseBody), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(
-                    new BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(), e.getMessage(), null),
-                    HttpStatus.NOT_FOUND);
-
-        }
-    }
-
+    /*
+     * @PostMapping("/list/all")
+     * public ResponseEntity<BaseResponse> getAllPosts(@RequestBody
+     * PostGetAllRequest postGetAllRequest) {
+     * try {
+     * // get sort Direction
+     * Sort.Direction sortDirection =
+     * Sort.Direction.fromString(postGetAllRequest.getSortType());
+     * // Get Posts data with pagination and sorted
+     * List<Post> paginatedData =
+     * postService.getSortedDataAll(postGetAllRequest.getSortBy(),
+     * sortDirection);
+     * // if data empty
+     * if (paginatedData.size() == 0) {
+     * return new ResponseEntity<>(new
+     * BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(),
+     * "Empty List", null), HttpStatus.NOT_FOUND);
+     * }
+     * 
+     * // mapped response body
+     * Map<String, Object> responseBody = new HashMap<>();
+     * responseBody.put("sortBy", postGetAllRequest.getSortBy());
+     * responseBody.put("sortType", sortDirection);
+     * responseBody.put("rowTotal", paginatedData.size());
+     * responseBody.put("data", paginatedData);
+     * 
+     * // return response body
+     * return new ResponseEntity<>(new
+     * BaseResponse(ResponseStatusCode.SUCCESS.code(),
+     * ResponseStatusCode.SUCCESS.desc(), responseBody), HttpStatus.OK);
+     * } catch (Exception e) {
+     * return new ResponseEntity<>(
+     * new BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(), e.getMessage(),
+     * null),
+     * HttpStatus.NOT_FOUND);
+     * 
+     * }
+     * }
+     */
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getPostById(@PathVariable Long id) {
         try {
