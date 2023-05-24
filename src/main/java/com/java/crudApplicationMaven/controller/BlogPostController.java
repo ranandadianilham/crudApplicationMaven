@@ -38,44 +38,21 @@ public class BlogPostController {
             Map<String, Object> responseBody = new HashMap<>();
             // if page no empty, row per page empty get all
             if (postGetAllRequest.getPageNo() == 0 && postGetAllRequest.getRowPerPage() == 0) {
-                List<Post> paginatedData = postService.getSortedDataAll(postGetAllRequest.getSortBy(),
+                responseBody = postService.getSortedDataAll(postGetAllRequest.getSortBy(),
                         sortDirection);
-                // if data empty
-                if (paginatedData.size() == 0) {
-                    return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(),
-                            "Empty List", null), HttpStatus.NOT_FOUND);
-                }
-
-                // mapped response body
-                responseBody.put("sortBy", postGetAllRequest.getSortBy());
-                responseBody.put("sortType", sortDirection);
-                responseBody.put("rowTotal", paginatedData.size());
-                responseBody.put("data", paginatedData);
-
-                return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.SUCCESS.code(),
-                        ResponseStatusCode.SUCCESS.desc(), responseBody), HttpStatus.OK);
+            } else {
+                // Get Posts data with pagination and sorted
+                // pagination start from page 0.
+                responseBody = postService.getPaginatedAndSortedData(
+                        postGetAllRequest.getPageNo(), postGetAllRequest.getRowPerPage(), postGetAllRequest.getSortBy(),
+                        sortDirection);
             }
-
-            // Get Posts data with pagination and sorted
-            // pagination start from page 0.
-            Page<Post> paginatedData = postService.getPaginatedAndSortedData(
-                    postGetAllRequest.getPageNo(), postGetAllRequest.getRowPerPage(), postGetAllRequest.getSortBy(),
-                    sortDirection);
 
             // if data empty
-            if (paginatedData.getSize() == 0) {
+            if (responseBody.size() == 0) {
                 return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.DATA_NOT_FOUND.code(),
-                        ResponseStatusCode.DATA_NOT_FOUND.desc(), null), HttpStatus.NOT_FOUND);
+                        ResponseStatusCode.DATA_NOT_FOUND.desc(), responseBody), HttpStatus.NOT_FOUND);
             }
-            // mapped response body
-            responseBody.put("pageNo", postGetAllRequest.getPageNo());
-            responseBody.put("rowPerPage", postGetAllRequest.getRowPerPage());
-            responseBody.put("pageTotal", paginatedData.getTotalPages());
-            responseBody.put("sortBy", postGetAllRequest.getSortBy());
-            responseBody.put("sortType", sortDirection);
-            responseBody.put("rowTotal", paginatedData.getTotalElements());
-            responseBody.put("data", paginatedData.getContent());
-
             // return response body
             return new ResponseEntity<>(new BaseResponse(ResponseStatusCode.SUCCESS.code(),
                     ResponseStatusCode.SUCCESS.desc(), responseBody), HttpStatus.OK);
